@@ -1,15 +1,23 @@
 <?php
-/* tblist
+/* tblist tbpages
  * @banka2017 & KD·NETWORK
  */
 set_time_limit(0);
 ignore_user_abort(true);
-require(dirname(__FILE__) . '/config.php');
+require __DIR__ . '/scurl.php';
 // 创建连接
-$conn = new mysqli($servername, $username, $password, $dbname);
+
+class SSQlite extends SQLite3 {
+    function __construct () {
+        $this->open(__DIR__ . '/tblist.db');
+    }
+}
+
+$conn = new SSQlite();
+
 // 检测连接
-if ($conn->connect_error) {
-    die("连接失败: " . $conn->connect_error);
+if (!$conn) {
+    die("连接失败: " . $conn->lastReeorMsg());
 }
 $dirs = json_decode(file_get_contents(dirname(__FILE__).'/dir.json'), true);
 foreach ($dirs as $dir) {
@@ -24,7 +32,7 @@ foreach ($dirs as $dir) {
         }else{
             throw new Exception('网页访问出错！');
         }
-        $conn -> query($sql);
+        $conn -> exec('PRAGMA journal_mode = wal; BEGIN; ' . $sql . ' COMMIT;');
     }
 }
 $conn->close();
