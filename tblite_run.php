@@ -48,7 +48,7 @@ foreach ($dirs as $dir) {
                 $origin_pn = ++$auto_skip[2];
                 $skip = false;
             }
-            for ($x = $origin_pn; $x <= $pn; $x++) {
+            for ($x = $origin_pn; $x < $pn; $x++) {
                 $a = mb_convert_encoding(new sscurl("http://tieba.baidu.com/f/fdir?" . http_build_query(["ie" => "utf-8", "fd" => $fdir, "sd" => $sdir, "pn" => $x])), "UTF-8", "GBK");
                 preg_match_all('/<a href=\'http:\/\/tieba.baidu.com\/f\?kw=(.*)\' target=\'_blank\'>(.*)<\/a>/', $a, $c);
                 $sql = '';
