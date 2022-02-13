@@ -35,5 +35,6 @@ foreach ($dirs as $dir) {
         $conn -> exec('PRAGMA journal_mode = wal; BEGIN; ' . $sql . ' COMMIT;');
     }
 }
+$conn->exec('VACUUM;');
 $conn->close();
 echo "完成\n";

@@ -70,6 +70,7 @@ foreach ($dirs as $dir) {
             }}
     }
 }
+$conn->exec('VACUUM;');
 $conn->close();
 unlink(dirname(__FILE__).'/cursor.json');
 echo "完成\n";
