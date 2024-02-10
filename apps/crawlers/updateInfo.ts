@@ -21,6 +21,9 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
     }
     const tmpTiebaInfo = await GetForumInfo(tiebaList)
 
+    if (exist > total) {
+        break
+    }
     try {
         const tmpCount = {success: 0, error: 0}
         const tmpNow = new Date()
