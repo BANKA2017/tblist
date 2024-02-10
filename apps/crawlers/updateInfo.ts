@@ -12,8 +12,9 @@ const sqlTotal = db.query<[number]>("SELECT COUNT('id') as total FROM tblite;")[
 let exist = sqlExist
 const total = sqlTotal
 
+let limit = 60
 
-while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_urlencode FROM tblite WHERE real_fname IS NULL LIMIT 60;").map(data => ({id: data[0], fname: data[1], gb2312_urlencode: data[2]}))) {
+while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_urlencode FROM tblite WHERE fid = 0 AND real_fname IS NULL LIMIT " + limit + ";").map(data => ({id: data[0], fname: data[1], gb2312_urlencode: data[2]}))) {
     if (tiebaList.length < 1) {
         console.log('tblist: ended')
         break
@@ -55,6 +56,13 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
                 }
             }
         })
+
+        // dynamic limit
+        if (tmpCount.error > 10 && limit >= 20) {
+            limit -= 5
+        } else if (tmpCount.error <= 5 && limit <= 60) {
+            limit += 5
+        }
         console.log(Number(new Date()) - Number(tmpNow))
         console.log(tmpCount)
         console.log(tiebaList.map(tieba => tieba.fname).join(', ') + '')

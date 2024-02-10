@@ -54,7 +54,7 @@ interface GetForumInfoSuccessResponse {
         }[];
         ubs_abtest_config: null;
         ubs_sample_ids: null;
-        user: {};
+        user: unknown;
     };
     errmsg: string;
     errno: number | string;
@@ -79,6 +79,8 @@ interface GetForumInfoReturn {
     fname: GetForumInfoArgs | GetForumInfoArgs[]
 }
 
+const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1'
+
 const GetPage = (level1Name = '', level2Name: string | string[] = '', pn: number | number[] = 1, encode = 'utf8'): Promise<GetPageResponse|PromiseSettledResult<GetPageResponse>[]> => {
     if (Array.isArray(level2Name)) {
         return Promise.allSettled(level2Name.map(name => GetPage(level1Name, name, pn, encode)))
@@ -96,7 +98,7 @@ const GetPage = (level1Name = '', level2Name: string | string[] = '', pn: number
             method: 'GET',
             redirect: 'follow',
             headers: {
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+                'user-agent': userAgent,
             }
         }).then((response: Response): Promise<string | ArrayBuffer> => encode === 'binary' ? response.arrayBuffer() : response.text()).then((response: string | ArrayBuffer) => {
             resolve({response, level1Name, level2Name, pn, encode})
@@ -119,9 +121,9 @@ const GetForumInfo = (fname: GetForumInfoArgs | GetForumInfoArgs[] = []): Promis
             method: 'GET',
             redirect: 'follow',
             headers: {
-                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+                'user-agent': userAgent,
             }
-        }).then((response: Response): Promise<GetForumInfoSuccessResponse | GetForumInfoErrorResponse> => response.json()).then(response => {
+        }).then(response => response.json()).then(response => {
             resolve({response, fname})
         }).catch(e => {
             const textError = e.toString()
