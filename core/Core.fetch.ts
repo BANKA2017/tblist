@@ -79,13 +79,13 @@ interface GetForumInfoReturn {
     fname: GetForumInfoArgs | GetForumInfoArgs[]
 }
 
-const GetPage = async (level1Name = '', level2Name: string | string[] = '', pn: number | number[] = 1, encode = 'utf8'): Promise<GetPageResponse|PromiseSettledResult<GetPageResponse>[]> => {
+const GetPage = (level1Name = '', level2Name: string | string[] = '', pn: number | number[] = 1, encode = 'utf8'): Promise<GetPageResponse|PromiseSettledResult<GetPageResponse>[]> => {
     if (Array.isArray(level2Name)) {
-        return await Promise.allSettled(level2Name.map(name => GetPage(level1Name, name, pn, encode)))
+        return Promise.allSettled(level2Name.map(name => GetPage(level1Name, name, pn, encode)))
     } else if (Array.isArray(pn)) {
-        return await Promise.allSettled(pn.map(_pn => GetPage(level1Name, level2Name, _pn, encode)))
+        return Promise.allSettled(pn.map(_pn => GetPage(level1Name, level2Name, _pn, encode)))
     }
-    return await (new Promise((resolve, reject) => {
+    return (new Promise((resolve, reject) => {
         //https://tieba.baidu.com/f/fdir?fd=%B8%F6%C8%CB%CC%F9%B0%C9&sd=%B8%F6%C8%CB%CC%F9%B0%C9&pn=1500
         fetch(`https://tieba.baidu.com/f/fdir?` + (new URLSearchParams({
             ie: 'utf-8',
@@ -108,12 +108,11 @@ const GetPage = async (level1Name = '', level2Name: string | string[] = '', pn: 
 }
 
 //get forum info
-const GetForumInfo = async (fname: GetForumInfoArgs | GetForumInfoArgs[] = []): Promise<GetForumInfoReturn|PromiseSettledResult<GetForumInfoReturn>[]> => {
+const GetForumInfo = (fname: GetForumInfoArgs | GetForumInfoArgs[] = []): Promise<GetForumInfoReturn|PromiseSettledResult<GetForumInfoReturn>[]> => {
     if (Array.isArray(fname)) {
-        return await Promise.allSettled(fname.map(name => GetForumInfo(name)))
+        return Promise.allSettled(fname.map(name => GetForumInfo(name)))
     }
-    return await (new Promise((resolve, reject) => {
-
+    return (new Promise((resolve, reject) => {
         fetch(`https://tieba.baidu.com/mg/f/getFrsData?` + (new URLSearchParams({
             kw: fname.fname.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll('&#039;', "'")
         }).toString()), {
