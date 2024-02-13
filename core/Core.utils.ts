@@ -25,4 +25,10 @@ const ArrayFill = (start: number, count: number): number[] => {
     return tmpArray
 }
 
-export {basePath, apiTemplate, ArrayFill}
+const htmlspecialchars = (str: string) => {
+    str = str.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll('&#039;', "'")
+    str = str.replaceAll(/&#([\d]+);/gm, (_, p1) => String.fromCharCode(parseInt(p1)))
+    return str
+}
+
+export {basePath, apiTemplate, ArrayFill, htmlspecialchars}

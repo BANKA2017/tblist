@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { ArrayFill, basePath } from '../../core/Core.utils.ts';
+import { ArrayFill, basePath, htmlspecialchars } from '../../core/Core.utils.ts';
 import { GetPage } from '../../core/Core.fetch.ts';
 import db from '../../core/Core.sql.ts';
 
@@ -64,7 +64,7 @@ for (const dir of dirInfo) {
             try {
                 db.transaction(() => {
                     for (const finfo of tmpList) {
-                        db.query('INSERT INTO `tblite` (level_1_name, level_2_name, fname, gb2312_urlencode) VALUES (:level_1_name, :level_2_name, :fname, :gb2312_urlencode)', {level_1_name: dir.level_1_name, level_2_name: dir.level_2_name, fname: finfo.fname.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll("&amp;", "&").replaceAll("&quot;", '"'), gb2312_urlencode: finfo.gb2312_urlencode})
+                        db.query('INSERT INTO `tblite` (level_1_name, level_2_name, fname, gb2312_urlencode) VALUES (:level_1_name, :level_2_name, :fname, :gb2312_urlencode)', {level_1_name: dir.level_1_name, level_2_name: dir.level_2_name, fname: htmlspecialchars(finfo.fname), gb2312_urlencode: finfo.gb2312_urlencode})
                     }
                 })
                 //console.log(`tblist: ` + tmpList.map(info => info.fname).join(', '))

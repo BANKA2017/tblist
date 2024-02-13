@@ -1,3 +1,5 @@
+import { htmlspecialchars } from './Core.utils.ts'
+
 interface GetPageResponse {
     response: string | ArrayBuffer;
     level1Name: string;
@@ -10,6 +12,8 @@ interface GetForumInfoArgs {
     id: number;
     fname: string;
     gb2312_urlencode: string
+    level_1_name?: string
+    level_2_name?: string
 }
 
 interface GetForumInfoSuccessResponse {
@@ -116,7 +120,7 @@ const GetForumInfo = (fname: GetForumInfoArgs | GetForumInfoArgs[] = []): Promis
     }
     return (new Promise((resolve, reject) => {
         fetch(`https://tieba.baidu.com/mg/f/getFrsData?` + (new URLSearchParams({
-            kw: fname.fname.replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll('&#039;', "'")
+            kw: htmlspecialchars(fname.fname)
         }).toString()), {
             method: 'GET',
             redirect: 'follow',
