@@ -32,7 +32,7 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
                 if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && !tiebaInfo.value?.response?.errno) {
                     const updateFdirOrSdir = !((tiebaInfo?.value?.fname?.level_1_name || tiebaInfo?.reason?.fname?.level_1_name) && (tiebaInfo?.value?.fname?.level_2_name || tiebaInfo?.reason?.fname?.level_2_name))
                     db.query("UPDATE tblite SET real_fname = :real_fname, fid = :fid, member_num = :member_num, post_num = :post_num, thread_num = :thread_num, updated_at = datetime('now')" + (updateFdirOrSdir ? ", level_1_name = :level_1_name, level_2_name = :level_2_name" : '') + " WHERE id = :id", {
-                        id: tiebaInfo?.value?.fname?.id || tiebaInfo?.reason?.fname?.id,
+                        id: tiebaInfo?.value?.fname?.id || tiebaInfo?.reason?.fname?.id || 0,
                         real_fname: tiebaInfo.value.response?.data?.forum?.name || '',
                         fid: tiebaInfo.value.response?.data?.forum?.id || 0,
                         member_num: tiebaInfo.value.response?.data?.forum?.member_num || 0,
@@ -43,7 +43,7 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
                     })
                 } else if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && [340000, 340001].includes(tiebaInfo.value?.response?.errno)) {
                     db.query("UPDATE tblite SET real_fname = :real_fname, fid = :fid, member_num = :member_num, post_num = :post_num, thread_num = :thread_num, updated_at = datetime('now') WHERE id = :id", {
-                        id: tiebaInfo?.value?.fname?.id || tiebaInfo?.reason?.fname?.id,
+                        id: tiebaInfo?.value?.fname?.id || tiebaInfo?.reason?.fname?.id || 0,
                         real_fname: tiebaInfo.value?.response?.errmsg,//tiebaInfo.value.response?.data?.forum?.name || '',
                         fid: tiebaInfo.value.response?.data?.forum?.id || 0,
                         member_num: tiebaInfo.value.response?.data?.forum?.member_num || 0,
