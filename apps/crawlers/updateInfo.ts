@@ -41,7 +41,8 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
                         level_1_name: tiebaInfo.value.response?.data?.forum?.first_dir || '',
                         level_2_name: tiebaInfo.value.response?.data?.forum?.second_dir || ''
                     })
-                } else if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && [340000, 340001].includes(tiebaInfo.value?.response?.errno)) {
+                } else if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && [340000, 340001, 2800001].includes(tiebaInfo.value?.response?.errno)) {
+                    // '二十二冶' 是唯一一个 `2800001` 的贴吧, 这个贴吧需要使用桌面版网页获取信息
                     db.query("UPDATE tblite SET real_fname = :real_fname, fid = :fid, member_num = :member_num, post_num = :post_num, thread_num = :thread_num, updated_at = datetime('now') WHERE id = :id", {
                         id: tiebaInfo?.value?.fname?.id || tiebaInfo?.reason?.fname?.id || 0,
                         real_fname: tiebaInfo.value?.response?.errmsg,//tiebaInfo.value.response?.data?.forum?.name || '',
