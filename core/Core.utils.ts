@@ -31,4 +31,31 @@ const htmlspecialchars = (str: string) => {
     return str
 }
 
-export {basePath, apiTemplate, ArrayFill, htmlspecialchars}
+const convertURIToUTF8 = (str: string, encode = 'gbk') => {
+    const matchCode = [...str.matchAll(/%[\da-fA-F]{2}/gm)]
+    const tmpUint8Array = []
+    if (matchCode.length === 0) {
+        return str
+    } else if (matchCode.length > 0 && (matchCode[0].index || -1) > 0) {
+        for (let i = 0; i < (matchCode[0].index || -1); i++) {
+            tmpUint8Array.push(str.charCodeAt(i))
+        }
+    }
+    for (const codeIndex in matchCode) {
+        const index = Number(codeIndex)
+        const code = matchCode[codeIndex]
+        tmpUint8Array.push(parseInt(code[0].slice(1), 16))
+        
+        let nextIndex = str.length
+        if (index < matchCode.length - 1) {
+            nextIndex = matchCode[index + 1].index || -1
+        }
+        for (let i = code.index + 3; i < nextIndex; i++) {
+            tmpUint8Array.push(str.charCodeAt(i))
+        }
+    }
+    
+    return new TextDecoder(encode).decode(new Uint8Array(tmpUint8Array))
+}
+
+export {basePath, apiTemplate, ArrayFill, htmlspecialchars, convertURIToUTF8}
