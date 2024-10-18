@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
-import { DB } from "https://deno.land/x/sqlite@v3.7.0/mod.ts";
+import { serve } from "jsr:@std/http@0.224.0"
+import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import { apiTemplate, basePath } from "../../core/Core.utils.ts"
 
 const port = 3010
