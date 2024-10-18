@@ -4,17 +4,12 @@
 
 ## 取得 dir.json
 
-使用大吧主账号登录后打开吧务后台，打开开发者控制台（F12），运行
-
 ```javascript
 (async () => {
-    let response = await fetch('http://tieba.baidu.com/bawu2/platform/getAllDir?word='+ [...(document.getElementsByClassName("forum-name")[0].innerText)].slice(0, -1).join('') +'&ie=utf-8')
-    console.log(JSON.encode((await response.json()).all_dir))
+    let response = await fetch('https://tieba.baidu.com/mo/q/common/getAllForumDir')
+    console.log(JSON.stringify(Object.entries((await response.json()).data).filter(list => !isNaN(list[0])).map(list => {list[1].level_2_name = list[1].level_2_name.sort((a, b) => a.level_1_name > b.level_1_name ? 1 : -1); return list[1]}).sort((a, b) => a.level_1_name > b.level_1_name ? 1 : -1)))
 })()
 ```
 
-将返回的内容拷贝到 `~/assets/dir.json` 覆盖
+将返回的 `json` 拷贝到 `~/assets/dir.json` 覆盖
 
-## 授权
-
-- **dir.json** 文件内容为[**百度贴吧**](https://tieba.baidu.com)所有，
