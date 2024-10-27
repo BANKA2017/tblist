@@ -16,7 +16,7 @@ interface GetForumInfoArgs {
     level_2_name?: string
 }
 
-interface GetForumInfoSuccessResponse {
+interface GetForumInfoResponse {
     forum: {
         id: number
         post_num: number
@@ -28,21 +28,12 @@ interface GetForumInfoSuccessResponse {
         avatar: string
     }
     time: number
-}
-interface GetForumInfoErrorResponse {
-    errmsg: string;
-    errno: number | string;
-    logid?: number | string;
-    sample_id?: number;
-    server_time?: number;
-    tbs?: string;
-    time?: string;
-    ubs_abtest_config?: {[p in string]: string}[];
-    ubs_sample_ids?: string;
+    error_code: number | string
+    error_msg: string
 }
 
 interface GetForumInfoReturn {
-    response: string | GetForumInfoSuccessResponse | GetForumInfoErrorResponse;
+    response: string | GetForumInfoResponse
     fname: GetForumInfoArgs | GetForumInfoArgs[]
 }
 
