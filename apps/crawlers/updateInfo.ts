@@ -47,8 +47,9 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
                         level_1_name: tiebaInfo.value.response?.forum?.first_class || '',
                         level_2_name: tiebaInfo.value.response?.forum?.second_class || ''
                     })
-                } else if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && [3].includes(tiebaInfo.value?.response?.error_code)) {
+                } else if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && [3, 340001].includes(tiebaInfo.value?.response?.error_code)) {
                     // 3 -> 该吧还未建立，去看看其他贴吧吧
+                    // 340001 -> 抱歉，该吧内含有大量违规内容，暂不开放哦
                     db.query("UPDATE tblite SET real_fname = :real_fname, fid = :fid, member_num = :member_num, post_num = :post_num, thread_num = :thread_num, updated_at = datetime('now') WHERE id = :id", {
                         id: tiebaInfo?.value?.fname?.id || tiebaInfo?.reason?.fname?.id || 0,
                         real_fname: tiebaInfo.value?.response?.error_msg,//tiebaInfo.value.response?.forum?.name || '',
