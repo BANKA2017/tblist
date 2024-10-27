@@ -17,54 +17,17 @@ interface GetForumInfoArgs {
 }
 
 interface GetForumInfoSuccessResponse {
-    data: {
-        activityhead?: {
-            activity_title: string;
-            activity_type: number;
-            head_imgs: { img_url: string; pc_url: string; subtitle: string; title: string; }[];
-            top_size: {height: number; width: number};
-        };
-        forum: {
-            avatar: string;
-            first_dir: string;
-            id: number;
-            is_exists: number;
-            member_num: number;
-            name: string;
-            post_num: number;
-            second_dir: string;
-            theme_color: {[p in 'dark' | 'day' | 'night']: {[q in string]: string}}[];
-            thread_num: number;
-        };
-        nav_tab_info: {[p in string]: {tab_id: number; tab_name: string; tab_type: number; tab_url: string;}[]};
-        page: {
-            current_page: number;
-            has_more: number;
-            offset: number;
-            page_size: number;
-            req_num: number;
-            total_num: number;
-            total_page: number;
-        };
-        sample_id?: number | string;
-        tbs: string;
-        thread_list: [];
-        tokens: {[p in string]: string};
-        top_query: {
-            display_query: string;
-            hot_icon: number;
-            hot_num: number;
-            query_md5: string;
-        }[];
-        ubs_abtest_config: null;
-        ubs_sample_ids: null;
-        user: unknown;
-    };
-    errmsg: string;
-    errno: number | string;
-    logid: number | string;
-    server_time: number;
-    time: string;
+    forum: {
+        id: number
+        post_num: number
+        member_num: number
+        first_class: string
+        second_class: string
+        thread_num: number
+        name: string
+        avatar: string
+    }
+    time: number
 }
 interface GetForumInfoErrorResponse {
     errmsg: string;
@@ -83,7 +46,7 @@ interface GetForumInfoReturn {
     fname: GetForumInfoArgs | GetForumInfoArgs[]
 }
 
-const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1'
+const userAgent = 'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.37 Mobile/15E148 Safari/604.1'
 
 const GetPage = (level1Name = '', level2Name: string | string[] = '', pn: number | number[] = 1, encode = 'utf8'): Promise<GetPageResponse|PromiseSettledResult<GetPageResponse>[]> => {
     if (Array.isArray(level2Name)) {
@@ -114,24 +77,33 @@ const GetPage = (level1Name = '', level2Name: string | string[] = '', pn: number
 }
 
 //get forum info
+const getForumInfoLink = atob('aHR0cHM6Ly90aWViYS5iYWlkdS5jb20vYy9mL2Zycy9mcnNCb3R0b20')
 const GetForumInfo = (fname: GetForumInfoArgs | GetForumInfoArgs[] = []): Promise<GetForumInfoReturn|PromiseSettledResult<GetForumInfoReturn>[]> => {
     if (Array.isArray(fname)) {
         return Promise.allSettled(fname.map(name => GetForumInfo(name)))
     }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
     return (new Promise((resolve, reject) => {
-        fetch(`https://tieba.baidu.com/mg/f/getFrsData?` + (new URLSearchParams({
+        fetch(getForumInfoLink + '?' + (new URLSearchParams({
             kw: htmlspecialchars(fname.fname)
         }).toString()), {
             method: 'GET',
             redirect: 'follow',
             headers: {
-                'user-agent': userAgent,
-            }
+                'Subapp-Type': 'hybrid',
+                'user-agent': 'tieba/12.71.1.0',
+            },
+            signal: controller.signal
         }).then(response => response.json()).then(response => {
             resolve({response, fname})
         }).catch(e => {
             const textError = e.toString()
             reject({response: textError, fname})
+        }).finally(() => {
+            clearTimeout(timeout)
         })
     }))
 }
