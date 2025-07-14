@@ -85,7 +85,7 @@ const GetForumInfo = (fname: GetForumInfoArgs | GetForumInfoArgs[] = []): Promis
             redirect: 'follow',
             headers: {
                 'Subapp-Type': 'hybrid',
-                'user-agent': 'tieba/12.71.1.0',
+                'user-agent': 'tieba/12.58.1.0',
             },
             signal: controller.signal
         }).then(response => response.json()).then(response => {
