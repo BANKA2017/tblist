@@ -12,7 +12,7 @@ const sqlTotal = db.query<[number]>("SELECT COUNT('id') as total FROM tblite;")[
 let exist = sqlExist
 const total = sqlTotal
 
-let limit = 60
+let limit = 2
 
 let safeError = 0
 
@@ -47,6 +47,28 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
                         level_1_name: tiebaInfo.value.response?.forum?.first_class || '',
                         level_2_name: tiebaInfo.value.response?.forum?.second_class || ''
                     })
+
+                    if (tiebaInfo.value.response?.forum?.managers?.length) {
+                        for (const manager of tiebaInfo.value.response?.forum?.managers) {
+                            db.query("INSERT OR IGNORE INTO tbmanager ('fid','uid','name','show_name','portrait') VALUES (:fid,:uid,:name,:show_name,:portrait)", {
+                                fid: tiebaInfo.value.response?.forum?.id || 0,
+                                uid: manager.id || 0,
+                                name: manager.name || '',
+                                show_name: manager.show_name || '',
+                                portrait: manager.portrait || ''
+                            })
+                        }
+                    }
+
+                    if (tiebaInfo.value.response?.friend_forum?.length) {
+                        for (const friend_forum of tiebaInfo.value.response?.friend_forum) {
+                            db.query("INSERT OR IGNORE INTO tbfriendforum ('fid','target_fid','target_fname') VALUES (:fid,:target_fid,:target_fname)", {
+                                fid: tiebaInfo.value.response?.forum?.id || 0,
+                                target_fid: friend_forum.forum_id || 0,
+                                target_fname: friend_forum.forum_name || '',
+                            })
+                        }
+                    }
                 } else if (tiebaInfo.status === 'fulfilled' && tiebaInfo.value?.response && [3, 340001].includes(tiebaInfo.value?.response?.error_code)) {
                     // 3 -> 该吧还未建立，去看看其他贴吧吧
                     // 340001 -> 抱歉，该吧内含有大量违规内容，暂不开放哦
@@ -73,11 +95,15 @@ while (tiebaList = db.query<[number, string, string]>("SELECT id, fname, gb2312_
         })
 
         // dynamic limit
-        if (tmpCount.error > 10 && limit >= 10) {
-            limit -= 5
-        } else if (tmpCount.error <= 5 && limit <= 60) {
-            limit += 5
-        }
+        // if (tmpCount.error > 10 && limit >= 10) {
+        //     limit -= 5
+        // } else if (limit > 1 && tmpCount.error <= 5 && limit < 10) {
+        //     limit++
+        // } else if (tmpCount.error <= 5 && limit <= 60) {
+        //     limit += 5
+        // } else if (limit > 1 && tmpCount.success === 0) {
+        //     limit--
+        // }
 
         if (tmpCount.error === 0) {
             safeError = 0
